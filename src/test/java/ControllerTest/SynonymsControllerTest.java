@@ -20,8 +20,8 @@ public class SynonymsControllerTest {
 
     @Test
     public void testGetSynonyms_Success() {
-        String word = "example";
-        String apiUrl = "https://wordsapiv1.p.mashape.com/words/" + word + "/synonyms";
+        String word = "hello";
+        String apiUrl = "https://wordsapiv1.p.mashape.com/words/words/hello/synonyms?when=2023-08-07T14:05:22.164Z&encrypted=8cfdb189e7229b9bea9607beeb58bebcaeb22f0931f993b8";
         String responseBody = "[\"synonym1\", \"synonym2\"]";
         ResponseEntity<String> expectedResponse = new ResponseEntity<>(responseBody, HttpStatus.OK);
 
@@ -36,17 +36,21 @@ public class SynonymsControllerTest {
     }
 
     @Test
-    public void testGetSynonyms_Error() {
-        String word = "invalidword";
-        String apiUrl = "https://wordsapiv1.p.mashape.com/words/" + word + "/synonyms";
+    public void testGetSynonyms_InternalServerError() {
+        String word = "hello";
+        String apiUrl = "https://wordsapiv1.p.mashape.com/words/words/hello/synonyms?when=2023-08-07T14:05:22.164Z&encrypted=8cfdb189e7229b9bea9607beeb58bebcaeb22f0931f993b8";
+        String errorMessage = "Error al obtener los sinónimos";
 
-        when(restTemplate.getForEntity(apiUrl, String.class)).thenThrow(new RuntimeException("API Error"));
+        when(restTemplate.getForEntity(apiUrl, String.class))
+                .thenThrow(new RuntimeException(errorMessage));
 
         SynonymsController synonymsController = new SynonymsController(restTemplate);
         ResponseEntity<String> response = synonymsController.getSynonyms(word);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("Error al obtener los sinónimos", response.getBody());
+        assertEquals(errorMessage, response.getBody());
         verify(restTemplate, times(1)).getForEntity(apiUrl, String.class);
     }
+
+
 }

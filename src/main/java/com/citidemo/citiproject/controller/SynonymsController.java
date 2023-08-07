@@ -1,4 +1,5 @@
 package com.citidemo.citiproject.controller;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +21,18 @@ public class SynonymsController {
 
     @GetMapping("/synonyms/{word}")
     public ResponseEntity<String> getSynonyms(@PathVariable String word) {
-        String apiUrl = API_BASE_URL + word + "/synonyms";
+        String when = "2023-08-07T14:05:22.164Z";
+        String encrypted = "8cfdb189e7229b9bea9607beeb58bebcaeb22f0931f993b8";
+
+        String apiUrl = API_BASE_URL + "words/" + word + "/synonyms";
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
-            return response;
+            String completeUrl = apiUrl + "?when=" + when + "&encrypted=" + encrypted;
+            ResponseEntity<String> response = restTemplate.getForEntity(completeUrl, String.class);
+
+            return ResponseEntity.status(response.getStatusCode())
+                    .headers(response.getHeaders())
+                    .body(response.getBody());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener los sinónimos");
         }
